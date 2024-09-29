@@ -1,4 +1,3 @@
-import { strict as assert } from "assert";
 
 import { ObjectId } from "mongodb";
 import DocCollection, { BaseDoc } from "../framework/doc";
@@ -48,12 +47,20 @@ export default class LabelingConcept {
       throw new BadValuesError("item already has a label!")
     }
     await this.labels.partialUpdateOne({_id: label}, {items: labeldoc.items.concat(item)});
-    throw new Error("Not implemented!");
+    //throw new Error("Not implemented!");
   }
 
   async assertCreatorIsUser(_id: ObjectId, user: ObjectId) {
     // TODO not in recitation today :)
+    const label = await this.labels.readOne({ _id });
+    if (!label) {
+      throw new NotFoundError(`Label ${_id} does not exist!`);
+    }
+    if (label.creator.toString() !== user.toString()) {
+      throw new Error(`${user} is not the creator of label ${_id} :(`);
+    }
+  }
     //  - see Posting.assertAuthorIsUser
     //  - consider how to keep things both DRY and modular
-  }
 }
+
